@@ -90,6 +90,7 @@
                 tickWidth: 1, // thickness of grid lines
                 labelMargin: 3, // in pixels
                 borderWidth: 2,
+		borderColor: null,
                 clickable: null,
                 hoverable: false,
                 hoverColor: null,
@@ -145,6 +146,12 @@
         this.getPlotOffset = function() { return plotOffset; };
         this.getData = function() { return series; };
         this.getAxes = function() { return { xaxis: xaxis, yaxis: yaxis }; };
+        this.getRanges = function() {
+	    return [xaxis.min, xaxis.max, yaxis.min, yaxis.max];
+	}
+        this.getDataRanges = function() {
+	    return [xaxis.datamin, xaxis.datamax, yaxis.datamin, yaxis.datamax];
+	}
         
         // initialize
         parseOptions(options_);
@@ -937,7 +944,11 @@
             if (options.grid.showBorder && options.grid.borderWidth) {
                 // draw border
                 ctx.lineWidth = options.grid.borderWidth;
-                ctx.strokeStyle = options.grid.color;
+		if (options.grid.borderColor) {
+		    ctx.strokeStyle = options.grid.borderColor;
+		} else {
+		    ctx.strokeStyle = options.grid.color;
+		}
                 ctx.lineJoin = "round";
                 ctx.strokeRect(0, 0, plotWidth, plotHeight);
                 ctx.restore();
@@ -1731,7 +1742,7 @@
                 result.selected = findSelectedItem(result.raw.x, result.raw.y);
                 
                 // display the tooltip/hint if requested
-                if (!$.browser.msie && result.selected && result.selected.data.hints.show) {
+                if (/***BRUCE !$.browser.msie && BRUCE***/ result.selected && result.selected.data.hints.show) {
                     showHintDiv(result.selected.x,
                                 result.selected.y,
                                 result.selected.data);
