@@ -131,6 +131,7 @@
             lastMarker = null,
             // dedicated to storing data for buggy standard compliance cases
             workarounds = {},
+            selecting = false,
             // buffer constants
             RIGHT_SIDE_BUFFER = 10,
             BOTTOM_SIDE_BUFFER = 10;
@@ -1733,7 +1734,7 @@
                 lastMousePos.pageY = e.pageY;
             }
             
-            if ( options.grid.hoverable ) {
+            if ( (!selecting) && (options.grid.hoverable) ) {
                 var offset = eventHolder.offset();
                 result = { raw: { 
                     x: lastMousePos.pageX - offset.left - plotOffset.left,
@@ -1769,6 +1770,7 @@
                 workarounds.ondrag = document.ondrag;
                 document.ondrag = function () { return false; };
             }
+            selecting = true;
             
             setSelectionPos(selection.first, e);
             clearInterval(selectionInterval);
@@ -1836,10 +1838,16 @@
                 selectionInterval = null;
             }
 
+            selecting = false;
             setSelectionPos(selection.second, e);
             clearSelection();
-            if (!selectionIsSane() || e.which != 1)
+            if (e.which != 1) {
                 return false;
+            }
+            if (!selectionIsSane()) {
+                target.trigger("dblclick");     // simulate double-click
+                return false;
+            }
             
             drawSelection();
             triggerSelectedEvent();
@@ -2069,6 +2077,7 @@
         }
         
         function cleanup() {
+            selecting = false;
             $('.hint-wrapper').remove();
             draw();
         }
